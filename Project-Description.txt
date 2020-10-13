@@ -1,0 +1,193 @@
+Authentication and Security
+
+Hossein Rouhani
+
+*************************
+This is a very nice example of how using different methods for Authentications to your WebSite -> as the Level increases, it becomes more Secure!
+
+ 
+
+Level 1: 
+
+we store username(email) and password in the backend in the plaintext. In level 1, user at least cannot see the username/password by checking the source code in frontend, as they are stored in backend and the corresponding database! 
+
+**********************************************************************************************************************************************************************************************************************************
+
+Level 2:
+
+Here we want to use the encryption to encode the password. Good website that can be used for different encryption algorithm is ->  https://cryptii.com/
+
+We use a package called “mongoose-encryption” which can do both encryption and authentication for us. We use here only encryption part! 
+So we need to install it first ->  npm install mongoose-encryption
+There are several ways to encrypt the password, we use a simple one by passing a single Secret string to encrypt the password!
+So now if we have a look at our database we can see that the password has been encrypted in binary!
+
+**********************************************************************************************************************************************************************************************************************************
+
+
+Level 3: 
+
+The target here is how to keep the secret which we user for encryption safe, and not committing it into git repository! 
+We use a package called dotenv(https://www.npmjs.com/package/dotenv) by installing it as before:
+Npm install dotenv
+Then we need to create a .env file in the root directory of the project which is “Level 3 Security” and transfer the secret key here!
+Now we want to let the git to ignore to commit the .env file to the github. There are collections of templates here that we can use for different programming languages:
+https://github.com/github/gitignore  -> related to Node is useful for us!
+so we create our .gitignore file in the root of our project.  For our case here, the important one is:
+# dotenv environment variables file
+.env
+
+Cool tools for programming -> https://www.heroku.com/#
+
+So you need to add a file in the root directory ("Level 3 Security") called ".env" and put following inside:
+
+SECRET=ThisISthesecretUSEtoEncrypt.
+
+**********************************************************************************************************************************************************************************************************************************
+
+
+Level 4 : Hashing
+ 
+We store the hash of the password in the database. In the next time when user login, we again change his password to the Hash, and only compare the hash with the value in the database!
+We use MD5 package for this purpose, so first install it ->  npm install md5
+And then will remove the mangoose-encryption stuff from the code, as we do not need it anymore!
+
+********************************************************************************************************************************************************************************************************************************** 
+
+Level 5:  Hashing + Salt
+ 
+
+So basically, we append the salt which can be any numbers or characters to the end of the password, and then create a hash out of it. It is important to keep and store the Hash and Salt in the database. 
+
+One of the best hash algorithm in camparison to Md5, is bcrypt! Beside that bcrypt has the concept which can decide how many rounds of salt we want to do, the more, the saltier (more secure) the password will become! 
+AS before in order to install bcrypt, we need to use -> npm install bcrypt
+
+It might be the case that you need to install the bcrypt that match to the node version (it was not the case for me, as I did all by default)
+
+As we can see in the page of bcrypt (https://www.npmjs.com/package/bcrypt), it is very sensitive regarding the version of node which is currently running on the system. To check that we can simply use:
+node --version  
+
+so in order to check our node version to the most stable version of the node, which can figure out directly from node website, we need to install NVM (https://github.com/nvm-sh/nvm), we have done it: (this is for Linux) , 
+for windows another one:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+and then we can choose the exact version of the npm! 
+
+
+
+**********************************************************************************************************************************************************************************************************************************
+
+Level 6: cookies and sessions
+
+The target here is to use cookies and sessions in our application. For this purpose we use, Passport (http://www.passportjs.org/):
+Passport is authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped in to any Express-based web application. 
+A comprehensive set of strategies support authentication using a username and password, Facebook, Twitter, and more
+
+To start we need to install following packages in our project:
+npm install passport passport-local passport-local-mongoose express-session
+
+Here we want to use Hashing and Salting and authentication using Passport-local-mongoose, so we delete everything that we have in both /register and /login part of app.post!
+Read this properly:
+https://expressjs.com/en/advanced/best-practice-security.html
+
+Sessions
+In a typical web application, the credentials used to authenticate a user will only be transmitted during the login request. If authentication succeeds, a session will be established and maintained via a cookie set in the user's browser.
+Each subsequent request will not contain credentials, but rather the unique cookie that identifies the session. In order to support login sessions, Passport will serialize and deserialize user instances to and from the session.
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
+In this example, only the user ID is serialized to the session, keeping the amount of data stored within the session small. When subsequent requests are received, this ID is used to find the user, which will be restored to req.user.
+The serialization and deserialization logic is supplied by the application, allowing the application to choose an appropriate database and/or object mapper, without imposition by the authentication layer.
+Keep it in mind that Serilize and Deserilize is only necessary when we are using the Sessions. When we tell to serilize, basically it create the cookies for us and will store some messages for us inside it like Users identification stuff. 
+And when we decentralize the cookies, basically it crumble the cookie and discover the message inside which tell who the user is (for authentication purpose)!
+The above code is when we are only using Passport and passport-local, but since here we are using passport-local-mongoose, we use the 3 line of code as follow: (https://www.npmjs.com/package/passport-local-mongoose) 
+
+passport.use(User.createStrategy());
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+so basically if the user one time Register, he will be redircted to the /secrets page. But afterward, as long as he does not close his Browser, he will be able to go directly to http://localhost:3000/secrets! 
+Since the cookies has been cashed. We can see the cookies related to localhost in our browser settings!
+
+
+If we close the browser completely, then cookies will be gone and we can no longer go directly to the /secrets page!
+
+Extra here we add the logout rout in our server (app.js) since in the secrets page we have mentioned that bottom, but never used!
+Attention -> whenever the server is restarted, the cookies will also be deleted!
+
+
+**********************************************************************************************************************************************************************************************************************************
+
+Level 7: -> Using Third-Party OAuth
+
+It is an open standard for token based authorization. By using it for authentication, we can access some info on third-party platform. But the main benefit, is to giving the responsibility of managing the Username/Password securely, 
+to third party platform. 
+
+3 Main feature of OAuth is following:
+	•	Granular Access Levels: It means that developer can decide which level of info he can request beside authentication request from the 3th-party platform like facebook (which can be friend email list,…)
+	•	Read/Read+Write access:  
+	•	Revoke Access: means user can go to the 3th-part platform like facebook, and remove the access from that website!
+
+We can request 2 things from the 3th-party website, upon user login:
+	•	Authorization Code: it is kind of Ticket that used only for authentication! 
+	•	Access Token: we can use it for a long time and can be used for asking some extra info
+
+Here we want to use Google as 3th-party for authenticating us, and we will use Passport for this purpose. We go to passport website (http://www.passportjs.org/packages/) and will search for “passport-google-Oauth2.0”!
+First we install it -> npm install passport-google-oauth20
+
+First step: Create an Application
+Before using passport-google-oauth20, you must register an application with Google. If you have not already done so, a new project can be created in the Google Developers Console.
+Your application will be issued a client ID and client secret, which need to be provided to the strategy. You will also need to configure a redirect URI which matches the route in your application.
+So we go to -> https://console.developers.google.com/   -> Create New Project
+
+ 
+After creation, we go to the Credentials part of APIs & Services, and then “OAuth Consent Screen” which we will configure the screen that users will see when requesting to authenticate with google!
+I only give the Application Name and rest as default, then will save the page! At the next level, I go to Credentials ->  + Create Credentials ->  OAuth Client ID -> Web Application
+	•	Authorized JavaScript Origins -> it is the website which request to google for authentication!
+	•	Authorized redirect URIs -> This is a route in our server, when google authenticated our user to return to! So that we can locally authenticate them and save the session & cookies and all of them! 
+
+ 
+After the creation we get 2 important items, which are:
+	•	Your Client ID
+	•	Your Client Secret
+
+We will put both of them in .env file (root directory) to have them secret:
+•	CLIENT_ID=367XXXXXXXXXXXX.apps.googleusercontent.com
+•	CLIENT_SECRET=KKQsaXXXXXXXXXXX
+
+
+Second Step:  Configure the strategy
+We write bunch of code, mainly copied from passport itself. We need a package called mongoose-findorcreate:
+npm install mongoose-findorcreate
+
+
+third Step:  adding a bottom
+we need to add a bottom in frontend in Login & Register pages that can redirect us to google!
+
+*** Keep it in mind if you are using the proxy, you might get following error: InternalOAuthError: Failed to obtain access token -> which need to cofigure the proxy into your app!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
