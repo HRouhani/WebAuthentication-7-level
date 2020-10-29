@@ -17,7 +17,7 @@ Level 2:
 
 Here we want to use the encryption to encode the password. Good website that can be used for different encryption algorithm is ->  https://cryptii.com/
 
-We use a package called “mongoose-encryption” which can do both encryption and authentication for us. We use here only encryption part! 
+We use a package called â€œmongoose-encryptionâ€ which can do both encryption and authentication for us. We use here only encryption part! 
 So we need to install it first ->  npm install mongoose-encryption
 There are several ways to encrypt the password, we use a simple one by passing a single Secret string to encrypt the password!
 So now if we have a look at our database we can see that the password has been encrypted in binary!
@@ -30,7 +30,7 @@ Level 3:
 The target here is how to keep the secret which we user for encryption safe, and not committing it into git repository! 
 We use a package called dotenv(https://www.npmjs.com/package/dotenv) by installing it as before:
 Npm install dotenv
-Then we need to create a .env file in the root directory of the project which is “Level 3 Security” and transfer the secret key here!
+Then we need to create a .env file in the root directory of the project which is â€œLevel 3 Securityâ€ and transfer the secret key here!
 Now we want to let the git to ignore to commit the .env file to the github. There are collections of templates here that we can use for different programming languages:
 https://github.com/github/gitignore  -> related to Node is useful for us!
 so we create our .gitignore file in the root of our project.  For our case here, the important one is:
@@ -128,19 +128,18 @@ Attention -> whenever the server is restarted, the cookies will also be deleted!
 
 Level 7: -> Using Third-Party OAuth
 
-It is an open standard for token based authorization. By using it for authentication, we can access some info on third-party platform. But the main benefit, is to giving the responsibility of managing the Username/Password securely, 
-to third party platform. 
+It is an open standard for token based authorization. By using it for authentication, we can access some info on third-party platform. But the main benefit, is to giving the responsibility of managing the Username/Password securely, to third party platform. 
 
 3 Main feature of OAuth is following:
-	•	Granular Access Levels: It means that developer can decide which level of info he can request beside authentication request from the 3th-party platform like facebook (which can be friend email list,…)
-	•	Read/Read+Write access:  
-	•	Revoke Access: means user can go to the 3th-part platform like facebook, and remove the access from that website!
+	â€¢	Granular Access Levels: It means that developer can decide which level of info he can request beside authentication request from the 3th-party platform like facebook (which can be friend email list,â€¦)
+	â€¢	Read/Read+Write access:  
+	â€¢	Revoke Access: means user can go to the 3th-part platform like facebook, and remove the access from that website!
 
 We can request 2 things from the 3th-party website, upon user login:
-	•	Authorization Code: it is kind of Ticket that used only for authentication! 
-	•	Access Token: we can use it for a long time and can be used for asking some extra info
+	â€¢	Authorization Code: it is kind of Ticket that used only for authentication! 
+	â€¢	Access Token: we can use it for a long time and can be used for asking some extra info
 
-Here we want to use Google as 3th-party for authenticating us, and we will use Passport for this purpose. We go to passport website (http://www.passportjs.org/packages/) and will search for “passport-google-Oauth2.0”!
+Here we want to use Google as 3th-party for authenticating us, and we will use Passport for this purpose. We go to passport website (http://www.passportjs.org/packages/) and will search for â€œpassport-google-Oauth2.0â€!
 First we install it -> npm install passport-google-oauth20
 
 First step: Create an Application
@@ -149,19 +148,19 @@ Your application will be issued a client ID and client secret, which need to be 
 So we go to -> https://console.developers.google.com/   -> Create New Project
 
  
-After creation, we go to the Credentials part of APIs & Services, and then “OAuth Consent Screen” which we will configure the screen that users will see when requesting to authenticate with google!
+After creation, we go to the Credentials part of APIs & Services, and then â€œOAuth Consent Screenâ€ which we will configure the screen that users will see when requesting to authenticate with google!
 I only give the Application Name and rest as default, then will save the page! At the next level, I go to Credentials ->  + Create Credentials ->  OAuth Client ID -> Web Application
-	•	Authorized JavaScript Origins -> it is the website which request to google for authentication!
-	•	Authorized redirect URIs -> This is a route in our server, when google authenticated our user to return to! So that we can locally authenticate them and save the session & cookies and all of them! 
+	â€¢	Authorized JavaScript Origins -> it is the website which request to google for authentication!
+	â€¢	Authorized redirect URIs -> This is a route in our server, when google authenticated our user to return to! So that we can locally authenticate them and save the session & cookies and all of them! 
 
  
 After the creation we get 2 important items, which are:
-	•	Your Client ID
-	•	Your Client Secret
+	â€¢	Your Client ID
+	â€¢	Your Client Secret
 
 We will put both of them in .env file (root directory) to have them secret:
-•	CLIENT_ID=367XXXXXXXXXXXX.apps.googleusercontent.com
-•	CLIENT_SECRET=KKQsaXXXXXXXXXXX
+â€¢	CLIENT_ID=367XXXXXXXXXXXX.apps.googleusercontent.com
+â€¢	CLIENT_SECRET=KKQsaXXXXXXXXXXX
 
 
 Second Step:  Configure the strategy
